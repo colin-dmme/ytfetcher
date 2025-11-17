@@ -17,12 +17,12 @@ class SourceSection(ttk.LabelFrame):
         self._init_vars()
         self._build_ui()
         self._bind_events()
+        self.after(10, self._toggle_inputs)
 
     def _init_vars(self) -> None:
         self.mode_var = tk.StringVar(value=FetchMode.CHANNEL.value)
         self.channel_var = tk.StringVar()
         self.playlist_var = tk.StringVar()
-        self.video_text = tk.Text(self, height=4, width=40)
         self.max_results_var = tk.StringVar(value="25")
         self.manual_var = tk.BooleanVar(value=False)
         self.languages_var = tk.StringVar(value="en")
@@ -50,10 +50,12 @@ class SourceSection(ttk.LabelFrame):
         self.playlist_entry = ttk.Entry(grid, textvariable=self.playlist_var)
         self.playlist_entry.grid(row=2, column=1, columnspan=3, sticky="ew", pady=2)
 
-        ttk.Label(grid, text="Video IDs (mỗi dòng)").grid(row=3, column=0, sticky="nw")
-        video_container = ttk.Frame(grid)
-        video_container.grid(row=3, column=1, columnspan=3, sticky="ew")
-        self.video_text.pack(in_=video_container, fill="both", expand=True)
+        self.video_label = ttk.Label(grid, text="Video IDs (mỗi dòng)")
+        self.video_label.grid(row=3, column=0, sticky="nw")
+        self.video_container = ttk.Frame(grid)
+        self.video_container.grid(row=3, column=1, columnspan=3, sticky="ew")
+        self.video_text = tk.Text(self.video_container, height=4, width=40)
+        self.video_text.pack(fill="both", expand=True)
 
         ttk.Label(grid, text="Max results").grid(row=4, column=0, sticky="w")
         ttk.Entry(grid, textvariable=self.max_results_var, width=10).grid(row=4, column=1, sticky="w")
@@ -75,17 +77,28 @@ class SourceSection(ttk.LabelFrame):
 
         apply_responsive_grid(grid, 4)
 
-        self._toggle_inputs()
-
     def _bind_events(self) -> None:
         self.mode_var.trace_add("write", lambda *_: self._toggle_inputs())
 
     def _toggle_inputs(self) -> None:
-        mode = self.mode_var.get()
-        self.channel_entry.configure(state="normal" if mode == FetchMode.CHANNEL.value else "disabled")
-        self.playlist_entry.configure(state="normal" if mode == FetchMode.PLAYLIST.value else "disabled")
-        state = "normal" if mode == FetchMode.VIDEO_IDS.value else "disabled"
-        self.video_text.configure(state=state)
+        mode = FetchMode(self.mode_var.get())
+
+        if mode == FetchMode.CHANNEL:
+            self.channel_entry.configure(state=tk.NORMAL)
+            self.playlist_entry.configure(state=tk.DISABLED)
+            self.video_label.grid_remove()
+            self.video_container.grid_remove()
+        elif mode == FetchMode.PLAYLIST:
+            self.channel_entry.configure(state=tk.DISABLED)
+            self.playlist_entry.configure(state=tk.NORMAL)
+            self.video_label.grid_remove()
+            self.video_container.grid_remove()
+        else:
+            self.channel_entry.configure(state=tk.DISABLED)
+            self.playlist_entry.configure(state=tk.DISABLED)
+            self.video_label.grid(row=3, column=0, sticky="nw")
+            self.video_container.grid(row=3, column=1, columnspan=3, sticky="ew")
+            self.video_text.focus_set()
 
     def languages(self) -> list[str]:
         text = self.languages_var.get()
