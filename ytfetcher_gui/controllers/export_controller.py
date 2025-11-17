@@ -25,7 +25,8 @@ class ExportController:
         data: Sequence[ChannelData],
         metadata_fields: Sequence[str],
         include_timing: bool,
-        on_success: Callable[[Path], None],
+        language_codes: Sequence[str] | None,
+        on_success: Callable[[Sequence[Path]], None],
         on_error: Callable[[Exception], None],
     ):
         if not data:
@@ -34,12 +35,11 @@ class ExportController:
 
         def _task():
             if export_config.per_video:
-                written_paths = []
+                written_paths: list[Path] = []
                 for channel_data in data:
                     video_id = channel_data.video_id
                     title = channel_data.metadata.title if channel_data.metadata else "video"
-                    languages = [getattr(t, "language", None) for t in (channel_data.transcripts or [])]
-                    lang = extract_primary_language(languages)
+                    lang = extract_primary_language(language_codes or [])
                     slug = (slugify_title(title) or "video")[:25]
                     base_name = f"{slug}-{video_id}-{lang}"
                     exporter = Exporter(

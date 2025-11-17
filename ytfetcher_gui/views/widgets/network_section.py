@@ -66,3 +66,15 @@ class NetworkSection(ttk.LabelFrame):
             timeout = 4.0
         return HTTPSettings(timeout=timeout, headers_raw=self.headers_text.get("1.0", tk.END).strip())
 
+    def apply_proxy_settings(self, proxy: ProxySettings) -> None:
+        self.http_proxy_var.set(proxy.http_proxy or "")
+        self.https_proxy_var.set(proxy.https_proxy or "")
+        self.webshare_user_var.set(proxy.webshare_username or "")
+        self.webshare_pass_var.set(proxy.webshare_password or "")
+
+    def apply_http_settings(self, settings: HTTPSettings) -> None:
+        self.timeout_var.set(str(settings.timeout))
+        self.headers_text.delete("1.0", tk.END)
+        if settings.headers_raw:
+            self.headers_text.insert("1.0", settings.headers_raw)
+

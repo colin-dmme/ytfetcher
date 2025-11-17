@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import tkinter as tk
 from pathlib import Path
+from typing import Sequence
 from tkinter import filedialog, ttk
 
-from ytfetcher_gui.models import ExportFormat
+from ytfetcher_gui.models import ExportConfig, ExportFormat
 from ytfetcher_gui.views.layouts import apply_responsive_grid
 
 
@@ -82,4 +83,26 @@ class ExportSection(ttk.LabelFrame):
 
     def output_dir(self) -> Path:
         return Path(self.output_dir_var.get())
+
+    def build_config(self, validate: bool = False) -> ExportConfig:
+        filename = self.filename_var.get().strip()
+        if validate and not filename:
+            raise ValueError("Tên file không được rỗng.")
+        if not filename:
+            filename = "ytfetcher_export"
+        return ExportConfig(
+            filename=filename,
+            output_dir=self.output_dir(),
+            format=self.export_format(),
+            per_video=self.per_video(),
+        )
+
+    def apply_config(self, config: ExportConfig, metadata_fields: Sequence[str], include_timing: bool) -> None:
+        self.filename_var.set(config.filename)
+        self.output_dir_var.set(str(config.output_dir))
+        self.format_var.set(config.format.value)
+        self.per_video_var.set(config.per_video)
+        self.include_timing_var.set(include_timing)
+        for field, var in self.metadata_flags.items():
+            var.set(field in metadata_fields if metadata_fields else field in {"title", "description"})
 

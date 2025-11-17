@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import logging
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
+from typing import Sequence
 
 from ytfetcher_gui.controllers import ExportController, FetchController
 from ytfetcher_gui.models import (
@@ -11,8 +14,11 @@ from ytfetcher_gui.models import (
     FetchConfig,
     FetchMode,
 )
+from ytfetcher_gui.storage import SettingsManager
 from ytfetcher_gui.views.dialogs import show_error, show_info, show_warning
 from ytfetcher_gui.views.widgets import ExportSection, NetworkSection, SourceSection
+
+logger = logging.getLogger(__name__)
 
 
 class MainWindow(ttk.Frame):
@@ -25,10 +31,14 @@ class MainWindow(ttk.Frame):
         self.master = master
         self.fetch_controller = fetch_controller
         self.export_controller = export_controller
+        self.settings_manager = SettingsManager()
+        self._last_fetch_config: FetchConfig | None = None
+        self._pending_fetch_config: FetchConfig | None = None
         self.status_var = tk.StringVar(value="Sẵn sàng")
         self.records_var = tk.StringVar(value="")
 
         self._build_layout()
+        self._load_settings()
 
     def _build_layout(self) -> None:
         self.master.title("YTFetcher GUI")
@@ -63,11 +73,12 @@ class MainWindow(ttk.Frame):
 
     def _on_fetch_click(self) -> None:
         try:
-            fetch_config = self._build_fetch_config()
+            fetch_config = self._get_fetch_config(validate=True)
         except ValueError as exc:
             show_error(self, "Thiếu dữ liệu", str(exc))
             return
 
+        self._pending_fetch_config = fetch_config
         self._toggle_busy(True)
         self.fetch_controller.start_fetch(
             fetch_config,
@@ -81,9 +92,10 @@ class MainWindow(ttk.Frame):
             show_warning(self, "Chưa có dữ liệu", "Hãy fetch trước khi export.")
             return
 
-        export_config = self._build_export_config()
+        export_config = self._get_export_config(validate=True)
         metadata_fields = self.export_section.selected_metadata()
         include_timing = self.export_section.include_timing()
+        language_codes = self._resolve_language_codes()
 
         self._toggle_busy(True)
         self.export_controller.start_export(
@@ -91,6 +103,7 @@ class MainWindow(ttk.Frame):
             data=self.fetch_controller.state.data_cache,
             metadata_fields=metadata_fields,
             include_timing=include_timing,
+            language_codes=language_codes,
             on_success=self._handle_export_success,
             on_error=self._handle_export_error,
         )
@@ -98,22 +111,24 @@ class MainWindow(ttk.Frame):
     def _handle_fetch_complete(self, data: list) -> None:
         self._toggle_busy(False)
         self.export_button.configure(state="normal")
+        self._last_fetch_config = self._pending_fetch_config
+        self._pending_fetch_config = None
         show_info(self, "Hoàn tất", f"Đã lấy {len(data)} video.")
 
     def _handle_fetch_error(self, exc: Exception) -> None:
         self._toggle_busy(False)
+        self._pending_fetch_config = None
         show_error(self, "Lỗi fetch", str(exc))
 
-    def _handle_export_success(self, path) -> None:
+    def _handle_export_success(self, paths: Sequence[Path]) -> None:
         self._toggle_busy(False)
-        if isinstance(path, list):
-            if not path:
-                show_info(self, "Export thành công", "Không có file nào được tạo.")
-                return
-            last_path = path[-1]
-            show_info(self, "Export thành công", f"Đã tạo {len(path)} file. File cuối: {last_path}")
+        if not paths:
+            show_info(self, "Export thành công", "Không có file nào được tạo.")
+            return
+        if len(paths) == 1:
+            show_info(self, "Export thành công", f"Đã lưu file tại:\n{paths[0]}")
         else:
-            show_info(self, "Export thành công", f"Đã lưu file tại:\n{path}")
+            show_info(self, "Export thành công", f"Đã tạo {len(paths)} file. File cuối: {paths[-1]}")
 
     def _handle_export_error(self, exc: Exception) -> None:
         self._toggle_busy(False)
@@ -134,56 +149,62 @@ class MainWindow(ttk.Frame):
                 self.export_button.configure(state="normal")
             self.progress.stop()
 
-    def _build_fetch_config(self) -> FetchConfig:
-        mode = FetchMode(self.source_section.mode_var.get())
-        scope = DataScope(self.source_section.scope_var.get())
+    def _get_fetch_config(self, validate: bool) -> FetchConfig:
+        config = self.source_section.build_config(validate=validate)
+        config.proxy = self.network_section.to_proxy_settings()
+        config.http = self.network_section.to_http_settings()
+        config.metadata_fields = self.export_section.selected_metadata()
+        config.include_timing = self.export_section.include_timing()
+        return config
 
-        channel = self.source_section.channel_var.get().strip()
-        playlist = self.source_section.playlist_var.get().strip()
-        video_ids = self.source_section.video_ids()
+    def _get_export_config(self, validate: bool) -> ExportConfig:
+        return self.export_section.build_config(validate=validate)
 
-        if mode == FetchMode.CHANNEL and not channel:
-            raise ValueError("Vui lòng nhập channel handle.")
-        if mode == FetchMode.PLAYLIST and not playlist:
-            raise ValueError("Vui lòng nhập playlist ID.")
-        if mode == FetchMode.VIDEO_IDS and not video_ids:
-            raise ValueError("Vui lòng nhập danh sách video IDs.")
+    def _resolve_language_codes(self) -> list[str]:
+        if self._last_fetch_config and self._last_fetch_config.languages:
+            return list(self._last_fetch_config.languages)
+        return self.source_section.languages()
 
+    def persist_settings(self) -> None:
+        self._persist_settings()
+
+    def _persist_settings(self) -> None:
         try:
-            max_results = int(self.source_section.max_results_var.get())
-        except ValueError:
-            raise ValueError("Max results phải là số.") from None
+            fetch_config = self._get_fetch_config(validate=False)
+            export_config = self._get_export_config(validate=False)
+            metadata_fields = self.export_section.selected_metadata()
+            include_timing = self.export_section.include_timing()
+            self.settings_manager.save(
+                fetch_config=fetch_config,
+                export_config=export_config,
+                metadata_fields=metadata_fields,
+                include_timing=include_timing,
+            )
+        except Exception as exc:
+            logger.debug("Không thể lưu cấu hình GUI: %s", exc)
 
-        if max_results <= 0:
-            raise ValueError("Max results phải lớn hơn 0.")
+    def _load_settings(self) -> None:
+        data = self.settings_manager.load()
+        if not data:
+            return
 
-        fetch_config = FetchConfig(
-            mode=mode,
-            scope=scope,
-            channel_handle=channel,
-            playlist_id=playlist,
-            video_ids_raw=video_ids,
-            max_results=max_results,
-            manually_created=bool(self.source_section.manual_var.get()),
-            languages=self.source_section.languages(),
-            metadata_fields=self.export_section.selected_metadata(),
-            include_timing=self.export_section.include_timing(),
-        )
+        fetch_data = data.get("fetch")
+        if fetch_data:
+            try:
+                fetch_config = self.settings_manager.deserialize_fetch(fetch_data)
+                self.source_section.apply_config(fetch_config)
+                self.network_section.apply_proxy_settings(fetch_config.proxy)
+                self.network_section.apply_http_settings(fetch_config.http)
+            except Exception as exc:
+                logger.debug("Không thể áp dụng cấu hình fetch: %s", exc)
 
-        fetch_config.proxy = self.network_section.to_proxy_settings()
-        fetch_config.http = self.network_section.to_http_settings()
-        return fetch_config
-
-    def _build_export_config(self) -> ExportConfig:
-        filename = self.export_section.filename_var.get().strip()
-        if not filename:
-            raise ValueError("Tên file không được rỗng.")
-
-        export_config = ExportConfig(
-            filename=filename,
-            output_dir=self.export_section.output_dir(),
-            format=ExportFormat(self.export_section.format_var.get()),
-            per_video=self.export_section.per_video(),
-        )
-        return export_config
+        export_data = data.get("export")
+        if export_data:
+            try:
+                export_config = self.settings_manager.deserialize_export(export_data)
+                metadata_fields = data.get("metadata_fields", [])
+                include_timing = data.get("include_timing", True)
+                self.export_section.apply_config(export_config, metadata_fields, include_timing)
+            except Exception as exc:
+                logger.debug("Không thể áp dụng cấu hình export: %s", exc)
 
