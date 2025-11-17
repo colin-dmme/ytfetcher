@@ -1,0 +1,185 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Quy tắc Quản lý Task cho Cursor AI
+
+## Giới thiệu
+- Đây là quy tắc dành riêng cho Cursor AI để quản lý task trong dự án.
+- Cursor phải LUÔN LUÔN sử dụng tiếng Việt khi tạo mọi task và mô tả.
+- Cursor phải tuân thủ đúng cấu trúc thư mục và định dạng file được chỉ định dưới đây.
+- Cursor nên chủ động tạo và cập nhật task mà không cần nhiều hướng dẫn lặp lại.
+
+## Cấu trúc Thư mục và Tổ chức
+
+1. **Thư mục Task**:
+   - Tạo và duy trì thư mục `tasks/` trong thư mục gốc của dự án
+   - Tất cả các file liên quan đến task phải được lưu trữ trong thư mục này
+   - Cấu trúc thư mục này phải được duy trì xuyên suốt vòng đời dự án
+
+2. **Quy ước Đặt tên File Task**:
+   - Tất cả các file task phải tuân theo định dạng: `tasks/task-[danh-mục].md`
+   - Trong đó `[danh-mục]` đại diện cho một tính năng, thành phần, hoặc loại task cụ thể (ví dụ: `tasks/task-vip.md`, `tasks/task-dang-nhap.md`, `tasks/task-loi.md`)
+   - Tên danh mục nên ngắn gọn, viết thường, và sử dụng dấu gạch ngang cho khoảng trắng (ví dụ: `tasks/task-he-thong-thanh-toan.md`)
+
+3. **Duy trì File Chỉ mục**:
+   - Duy trì file chỉ mục trung tâm `tasks/index.md` làm thư mục cho tất cả các file task
+   - Cập nhật chỉ mục này mỗi khi tạo hoặc xóa file task
+   - Chỉ mục nên bao gồm mô tả ngắn gọn về mục đích của mỗi file task
+   - File chỉ mục phải được viết bằng tiếng Việt
+
+4. **Tạo File Task**:
+   - File task mới có thể được tạo bất cứ lúc nào khi có danh mục mới xuất hiện
+   - Không có danh sách danh mục được xác định trước - hệ thống nên thích ứng với nhu cầu dự án
+   - Mỗi file task mới phải được ghi chép đầy đủ trong chỉ mục
+   - Luôn tạo file task mới trong thư mục `tasks/`
+   - Tất cả nội dung trong file task phải được viết bằng tiếng Việt
+
+## Định dạng và Cấu trúc Task
+
+5. **Định danh Task**:
+   - Mỗi task phải có một định danh duy nhất sử dụng định dạng: `[TIỀN TỐ]-[SỐ]`
+   - `[TIỀN TỐ]` nên là 2-4 ký tự viết tắt chỉ danh mục (ví dụ: VIP, LOI, UI)
+   - `[SỐ]` nên là một số thứ tự ba chữ số (ví dụ: 001, 002)
+   - Ví dụ: `VIP-001`, `LOI-003`, `UI-042`
+
+6. **Theo dõi Trạng thái Task**:
+   - Tất cả các task phải bao gồm chỉ báo trạng thái trong dấu ngoặc vuông
+   - Các trạng thái hợp lệ: 
+     * `[TODO]`: Chưa bắt đầu
+     * `[WIP]`: Đang thực hiện
+     * `[XEM XÉT]`: Đã hoàn thành nhưng cần xem xét
+     * `[HOÀN THÀNH]`: Hoàn thành đầy đủ
+     * `[BỊ CHẶN]`: Không thể tiếp tục (phải ghi rõ lý do)
+     * `[TẠM HOÃN]`: Hoãn đến ngày sau
+
+7. **Yêu cầu Nội dung Task**:
+   - Mỗi mục task phải bao gồm tối thiểu:
+     * Trạng thái và ID trong tiêu đề: `[TRẠNG THÁI] ID: Tiêu đề Ngắn gọn`
+     * Chi tiết: Mô tả toàn diện về task
+     * Độ ưu tiên: Cao/Trung bình/Thấp
+     * Phụ thuộc: Các task khác phải hoàn thành trước (nếu có)
+   - Các trường tùy chọn:
+     * Hạn chót
+     * Được giao cho
+     * Ước tính công sức
+     * Phần Ghi chú/Bình luận
+   - Tất cả nội dung PHẢI được viết bằng tiếng Việt
+
+## Quy trình Quản lý Task
+
+8. **Quy trình Tạo Task**:
+   - Khi một task mới được yêu cầu:
+     * Xác định danh mục phù hợp
+     * Kiểm tra xem đã có file task cho danh mục đó trong thư mục `tasks/` hay chưa
+     * Nếu chưa, tạo file task mới trong thư mục `tasks/` và thêm nó vào chỉ mục
+     * Gán ID tiếp theo có sẵn trong danh mục đó
+     * Ghi chép tất cả các trường bắt buộc
+     * Cursor PHẢI sử dụng tiếng Việt cho mọi nội dung
+
+9. **Cập nhật Trạng thái Task**:
+   - Khi cập nhật một task:
+     * Chỉ rõ file task và ID đang được cập nhật
+     * Ghi chép thay đổi trạng thái và lý do
+     * Thêm ghi chú tiến độ khi chuyển từ trạng thái này sang trạng thái khác
+     * Cập nhật các phụ thuộc nếu phát hiện trong quá trình thực hiện
+     * Tất cả nội dung cập nhật phải bằng tiếng Việt
+
+10. **Ghi chép Hoàn thành Task**:
+    - Khi đánh dấu một task là `[HOÀN THÀNH]`:
+      * Thêm ngày hoàn thành
+      * Ghi chép bất kỳ tác động đã biết nào đến các task khác
+      * Tóm tắt những gì đã hoàn thành
+      * Xác định bất kỳ task tiếp theo nào có thể cần thiết
+      * Tất cả nội dung phải bằng tiếng Việt
+
+## Quy tắc Tham chiếu và Mối quan hệ
+
+11. **Quản lý Phụ thuộc**:
+    - Các task có thể phụ thuộc vào các task khác trong cùng file hoặc trên các file khác nhau
+    - Phụ thuộc phải được ghi chép sử dụng tham chiếu đầy đủ: `[FILE]:[TASK-ID]`
+    - Ví dụ: "Phụ thuộc: tasks/task-dang-nhap.md:AUTH-002, tasks/task-vip.md:VIP-005"
+    - Phụ thuộc vòng tròn nên được xác định và giải quyết
+    - Mọi mô tả phụ thuộc phải bằng tiếng Việt
+
+12. **Liên kết Task Liên quan**:
+    - Khi các task có liên quan nhưng không phụ thuộc, sử dụng trường "Liên quan đến"
+    - Ghi chép mối quan hệ trong cả hai task liên quan
+    - Giải thích ngắn gọn bản chất của mối quan hệ
+    - Tất cả các mô tả phải bằng tiếng Việt
+
+## Bảo trì Hệ thống
+
+13. **Đánh giá Thường xuyên**:
+    - Định kỳ xem xét tất cả các file task để đảm bảo:
+      * Các task lỗi thời được lưu trữ
+      * Các task bị chặn được giải quyết
+      * Mức độ ưu tiên là phù hợp
+      * Các phụ thuộc vẫn còn hợp lệ
+    - Cập nhật các task dựa trên sự phát triển và yêu cầu mới của dự án
+    - Tất cả các cập nhật phải bằng tiếng Việt
+
+14. **Lưu trữ Task**:
+    - Các file task đã hoàn thành nên được chuyển đến thư mục `tasks/archived/`
+    - Giữ nguyên tên file gốc với tiền tố ngày tháng: `YYYY-MM-DD-task-[danh-mục].md`
+    - Cập nhật tasks/index.md để phản ánh trạng thái đã lưu trữ
+    - Tất cả các mô tả và ghi chú phải bằng tiếng Việt
+
+## Mẫu File Task
+
+15. **Mẫu File Task Mới**:
+    ```markdown
+    # Các Task [Tên Danh mục]
+    
+    File này theo dõi các task liên quan đến [mô tả ngắn gọn về danh mục].
+    
+    ## Các Task Đang Hoạt động
+    
+    ### [TODO] [TIỀN TỐ]-001: Tiêu đề task đầu tiên
+    - Chi tiết: Giải thích toàn diện về những gì cần được thực hiện
+    - Độ ưu tiên: Cao/Trung bình/Thấp
+    - Phụ thuộc: Không
+    
+    ## Các Task Đã Hoàn thành
+    
+    (Các task sẽ được chuyển đến đây khi hoàn thành)
+    ```
+
+16. **Mẫu Chỉ mục Task**:
+    ```markdown
+    # Chỉ mục Task
+    
+    File này đóng vai trò là thư mục trung tâm cho tất cả các file task trong dự án.
+    
+    ## Các File Task Đang Hoạt động
+    
+    - `task-[danh-mục1].md` - Mô tả các task danh mục 1
+    - `task-[danh-mục2].md` - Mô tả các task danh mục 2
+    
+    ## Các File Task Đã Lưu trữ
+    
+    - `archived/YYYY-MM-DD-task-[danh-mục].md` - Các task danh mục đã lưu trữ
+    ```
+
+## Hướng dẫn Cụ thể cho Cursor AI
+
+17. **Luôn kiểm tra chỉ mục task trước** khi tạo hoặc cập nhật task để đảm bảo file chính xác đang được sửa đổi.
+
+18. **Tham chiếu cả tên file và ID task** khi thảo luận hoặc triển khai task.
+
+19. **Cập nhật trạng thái ngay lập tức** khi bắt đầu hoặc hoàn thành công việc trên một task.
+
+20. **Ghi chép các thách thức không mong muốn** gặp phải trong quá trình triển khai như ghi chú trong task.
+
+21. **Tạo file task mới khi cần** mà không yêu cầu thay đổi các quy tắc này.
+
+22. **Duy trì cấu trúc thư mục tasks/** trong suốt vòng đời dự án, giữ tất cả các file liên quan đến task có tổ chức trong thư mục này.
+
+23. **Sử dụng tiếng Việt trong mọi trường hợp** khi tạo, cập nhật, hoặc tham chiếu đến các task. Điều này bao gồm mô tả task, ghi chú, tên file, và bất kỳ thông tin nào được thêm vào hệ thống task.
+
+24. **Chủ động đề xuất tạo task mới** khi phát hiện ra công việc cần làm trong quá trình triển khai các task hiện tại.
+
+
+
+25. **Giải thích rõ ràng mọi khái niệm kỹ thuật** bằng tiếng Việt để đảm bảo dễ hiểu.

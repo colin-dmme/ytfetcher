@@ -48,6 +48,24 @@ ytfetcher from_channel -c TheOffice -m 50 -f json
 
 ---
 
+## GUI Usage (Tkinter)
+
+You can also use a simple Tkinter desktop app that wraps every `ytfetcher` capability (channel/playlist/video IDs, language selection, manual transcripts, proxy + HTTP config, exporting to TXT/CSV/JSON).
+
+```bash
+uv run python -m ytfetcher_gui
+```
+
+The GUI follows an MVC structure:
+
+- **Nguồn dữ liệu**: select channel handle, playlist ID, or paste custom video IDs, set `max_results`, languages, and scope (transcripts only, metadata only, or full data).
+- **Kết nối**: configure HTTP/HTTPS proxy, Webshare credentials, timeout, and custom headers (JSON).
+- **Xuất dữ liệu**: choose export format, metadata fields, output directory, filename, and whether timings should be included.
+
+Progress and logs are displayed at the bottom of the window, and export is enabled once data has been fetched successfully.
+
+---
+
 ## CLI Overview
 YTFetcher comes with a simple CLI so you can fetch data directly from your terminal.
 

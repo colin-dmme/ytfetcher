@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+---
+luôn chạy lệnh terminal trong môi trường ảo bằng lệnh uv
+Luôn chạy lệnh trong môi trường ảo
+Quản lý thư viện phụ thuộc bằng lệnh UV
+Luôn sử dụng python 3.12.10
+File code không quá 700 dòng, nếu nhiều hơn phải tái cấu trúc cho phù hợp
+Tuân thủ các nguyên tắc thiết kế tính năng, giao diện chuẩn để dễ dàng phát triển và sửa đổi về sau.
+Tôi thường sử dụng tiếng việt nên chú ý về lỗi encoding 
+Không sử dụng các ký tự đặc biệt trong giao diện

@@ -1,0 +1,133 @@
+---
+alwaysApply: true
+---
+Python GUI Design Principles
+Introduction
+The user interface (GUI) is a crucial component of many Python applications, but it often becomes complex and difficult to maintain. The following principles help organize GUI code efficiently, prevent oversized and unmanageable gui.py files, and create high-quality user interfaces that remain sustainable throughout the development lifecycle.
+
+Rule 1: Apply the MVC (Model-View-Controller) Pattern
+
+Clearly separate data (Model), interface (View), and control logic (Controller)
+Avoid placing data processing or business logic in GUI files
+Ensure the View is only responsible for display and contains no business logic
+Use the Controller as a bridge between Model and View
+Design Models to operate independently of the GUI
+
+Rule 2: Implement Component-Based Design
+
+Break down interfaces into reusable components
+Define each GUI component in a separate file
+Create a widgets/ or components/ directory to house reusable UI elements
+Each component must have clear, distinct functionality and responsibility
+Design components to work independently and combine easily
+
+Rule 3: Establish Clear UI Directory Hierarchy
+
+Create a hierarchical directory structure for GUI code:
+
+views/: Contains main screens
+views/widgets/: Contains custom widgets
+views/dialogs/: Contains dialog boxes
+views/layouts/: Contains reusable layouts
+
+
+Name files according to UI component function
+Separate main screens and secondary screens into distinct modules
+
+Rule 4: Handle Events Efficiently
+
+Separate interface design from event handling
+Use callbacks or the Observer pattern for event handling
+Avoid nested and complex event handling
+Use clear function names for event handlers
+Keep event handling functions concise, only calling main controller functions
+
+Rule 5: Favor Composition Over Inheritance
+
+Prioritize composition (combining components) over inheritance
+Create small, specialized classes and combine them instead of complex inheritance trees
+Use composition to build complex interfaces from simple components
+Avoid multi-level inheritance from basic widgets of the GUI library
+
+Rule 6: Manage Layouts Systematically
+
+Separate layout logic from UI content
+Use layout managers instead of absolute positioning
+Create separate layout classes for complex, reusable layouts
+Design interfaces that respond to size changes
+Keep layout initialization code separate from content creation code
+
+Rule 7: Separate UI Initialization and Configuration
+
+Separate UI component initialization from their interface configuration
+Create dedicated methods for initialization (init_ui(), setup_ui())
+Create dedicated methods for connecting events (connect_signals(), setup_handlers())
+Separate interface configuration (style, colors, fonts) into separate methods or files
+Use consistent initialization approaches throughout the project
+
+Rule 8: Manage UI State Consistently
+
+Avoid storing UI state in multiple places
+Use patterns like State Management or Flux/Redux for complex UIs
+Update UI based on state, not by direct modification
+Design unidirectional data flow when possible (from model to view)
+Use signal/slot or event bus to communicate state changes
+
+Rule 9: Implement Lazy Loading and Performance Optimization
+
+Only create UI components when necessary (lazy initialization)
+Reuse UI components instead of constantly creating new ones
+Avoid creating too many widgets simultaneously
+Use pagination or virtual scrolling for large lists
+Optimize rendering and UI updates, only updating when necessary
+
+Rule 10: Implement Specialized Error Handling for UI
+
+Catch and handle errors gracefully in the GUI
+Prevent application crashes due to UI errors
+Display user-friendly error messages
+Log UI errors for debugging without disrupting user experience
+Restore the interface to a stable state when errors occur
+
+Rule 11: Design for Internationalization and Localization
+
+Separate text strings from UI source code
+Implement internationalization (i18n) from the beginning of the project
+Avoid hardcoding text strings directly in source code
+Design UIs that can adapt to different text lengths
+Support different date, number, and currency formats
+
+Rule 12: Test UI Components
+
+Separate UI code to enable automated testing
+Write unit tests for individual UI components
+Use mock objects to replace dependencies
+Implement automated testing for complex UI flows
+Design UI with testability in mind from the start
+
+Rule 13: Document UI Effectively
+
+Create documentation describing the overall GUI structure
+Draw UI flow and interaction diagrams
+Create a reference UI component library
+Write detailed docstrings for UI classes and methods
+Add clear comments for complex parts of UI code
+
+Rule 14: Develop Incrementally
+
+Develop UI in functional layers, from basic to complex
+Refactor regularly to maintain clean code
+Don't allow UI files to grow beyond 300-500 lines of code
+Separate new functionality into distinct modules
+Continuously improve UI components based on feedback and testing
+
+Rule 15: Design UI Framework-Independent Architectures
+
+Design abstract layers for key UI interactions
+Separate application logic from specific GUI framework details
+Allow for changing GUI libraries without affecting core logic
+Use the Adapter design pattern to interact with different GUI frameworks
+Avoid using framework-specific features unless necessary
+
+
+
