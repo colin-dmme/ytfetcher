@@ -60,12 +60,23 @@ class FetchConfig:
     http: HTTPSettings = field(default_factory=HTTPSettings)
 
     def video_ids(self) -> list[str]:
-        cleaned = [
+        tokens = [
             item.strip()
             for chunk in self.video_ids_raw.splitlines()
-            for item in chunk.split(",")
+            for item in chunk.replace(",", "\n").splitlines()
         ]
-        return [item for item in cleaned if item]
+        results: list[str] = []
+        for token in tokens:
+            if not token:
+                continue
+            results.append(token)
+        seen: set[str] = set()
+        deduped: list[str] = []
+        for vid in results:
+            if vid not in seen:
+                seen.add(vid)
+                deduped.append(vid)
+        return deduped
 
 
 @dataclass

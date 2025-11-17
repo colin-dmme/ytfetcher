@@ -11,7 +11,7 @@ from ytfetcher import YTFetcher
 from ytfetcher.config import HTTPConfig
 
 from ytfetcher_gui.models import AppState, DataScope, FetchConfig, FetchMode
-from ytfetcher_gui.services import AsyncTaskRunner
+from ytfetcher_gui.services import AsyncTaskRunner, VideoIdParser
 
 
 class FetchController:
@@ -82,7 +82,7 @@ class FetchController:
             return YTFetcher.from_channel(channel_handle=config.channel_handle.strip(), max_results=config.max_results, **kwargs)
         if config.mode == FetchMode.PLAYLIST:
             return YTFetcher.from_playlist_id(playlist_id=config.playlist_id.strip(), max_results=config.max_results, **kwargs)
-        video_ids = config.video_ids()
+        video_ids = VideoIdParser.parse(config.video_ids())
         return YTFetcher.from_video_ids(video_ids=video_ids, **kwargs)
 
     def _build_proxy_config(self, config: FetchConfig):

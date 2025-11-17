@@ -61,6 +61,8 @@ The GUI follows an MVC structure:
 - **Nguồn dữ liệu**: select channel handle, playlist ID, or paste custom video IDs, set `max_results`, languages, and scope (transcripts only, metadata only, or full data).
 - **Kết nối**: configure HTTP/HTTPS proxy, Webshare credentials, timeout, and custom headers (JSON).
 - **Xuất dữ liệu**: choose export format, metadata fields, output directory, filename, and whether timings should be included.
+- **Video IDs**: hỗ trợ cả ID thuần hoặc URL YouTube (`https://www.youtube.com/watch?v=...`, `https://youtu.be/...`). GUI sẽ tự động trích video_id hợp lệ và hiển thị số lượng đã nhận.
+- **Lưu cấu hình**: toàn bộ tùy chọn (nguồn dữ liệu, proxy, metadata, tùy chọn export…) được lưu ở `~/.ytfetcher_gui_settings.json` để tái sử dụng cho lần mở app tiếp theo.
 
 Progress and logs are displayed at the bottom of the window, and export is enabled once data has been fetched successfully.
 
