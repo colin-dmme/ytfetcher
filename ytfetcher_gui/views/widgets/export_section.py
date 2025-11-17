@@ -24,6 +24,7 @@ class ExportSection(ttk.LabelFrame):
         self.filename_var = tk.StringVar(value="ytfetcher_export")
         self.output_dir_var = tk.StringVar(value=str(Path.cwd()))
         self.include_timing_var = tk.BooleanVar(value=True)
+        self.per_video_var = tk.BooleanVar(value=False)
         self.format_var = tk.StringVar(value=ExportFormat.JSON.value)
         self.metadata_flags = {field: tk.BooleanVar(value=(field in {"title", "description"})) for field in self.METADATA_OPTIONS}
 
@@ -51,6 +52,7 @@ class ExportSection(ttk.LabelFrame):
         format_box.grid(row=2, column=1, sticky="w", pady=2)
 
         ttk.Checkbutton(frame, text="Bao gồm thời gian transcript", variable=self.include_timing_var).grid(row=3, column=0, columnspan=2, sticky="w")
+        ttk.Checkbutton(frame, text="Mỗi video xuất 1 file riêng", variable=self.per_video_var).grid(row=3, column=2, columnspan=1, sticky="w")
 
         meta_frame = ttk.LabelFrame(frame, text="Metadata")
         meta_frame.grid(row=4, column=0, columnspan=2, sticky="ew", pady=6)
@@ -74,6 +76,9 @@ class ExportSection(ttk.LabelFrame):
 
     def include_timing(self) -> bool:
         return bool(self.include_timing_var.get())
+
+    def per_video(self) -> bool:
+        return bool(self.per_video_var.get())
 
     def output_dir(self) -> Path:
         return Path(self.output_dir_var.get())

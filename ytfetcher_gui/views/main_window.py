@@ -106,7 +106,14 @@ class MainWindow(ttk.Frame):
 
     def _handle_export_success(self, path) -> None:
         self._toggle_busy(False)
-        show_info(self, "Export thành công", f"Đã lưu file tại:\n{path}")
+        if isinstance(path, list):
+            if not path:
+                show_info(self, "Export thành công", "Không có file nào được tạo.")
+                return
+            last_path = path[-1]
+            show_info(self, "Export thành công", f"Đã tạo {len(path)} file. File cuối: {last_path}")
+        else:
+            show_info(self, "Export thành công", f"Đã lưu file tại:\n{path}")
 
     def _handle_export_error(self, exc: Exception) -> None:
         self._toggle_busy(False)
@@ -176,6 +183,7 @@ class MainWindow(ttk.Frame):
             filename=filename,
             output_dir=self.export_section.output_dir(),
             format=ExportFormat(self.export_section.format_var.get()),
+            per_video=self.export_section.per_video(),
         )
         return export_config
 

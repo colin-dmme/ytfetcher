@@ -73,6 +73,7 @@ class ExportConfig:
     filename: str = "ytfetcher_export"
     output_dir: Path = Path.cwd()
     format: ExportFormat = ExportFormat.JSON
+    per_video: bool = False
 
 
 @dataclass
