@@ -55,15 +55,21 @@ class SourceSection(ttk.LabelFrame):
         self.video_container = ttk.Frame(grid)
         self.video_container.grid(row=3, column=1, columnspan=3, sticky="ew")
         self.video_text = tk.Text(self.video_container, height=4, width=40)
-        self.video_text.pack(fill="both", expand=True)
+        self.video_scroll = ttk.Scrollbar(self.video_container, orient="vertical", command=self.video_text.yview)
+        self.video_text.configure(yscrollcommand=self.video_scroll.set)
+        self.video_text.pack(side="left", fill="both", expand=True)
+        self.video_scroll.pack(side="right", fill="y")
 
-        ttk.Label(grid, text="Max results").grid(row=4, column=0, sticky="w")
-        ttk.Entry(grid, textvariable=self.max_results_var, width=10).grid(row=4, column=1, sticky="w")
+        self.video_stats_var = tk.StringVar(value="0 IDs")
+        ttk.Label(grid, textvariable=self.video_stats_var, foreground="#555555").grid(row=4, column=1, columnspan=3, sticky="w", pady=(2, 0))
 
-        ttk.Label(grid, text="Ngôn ngữ (cách nhau bởi dấu phẩy)").grid(row=5, column=0, sticky="w")
-        ttk.Entry(grid, textvariable=self.languages_var).grid(row=5, column=1, columnspan=3, sticky="ew")
+        ttk.Label(grid, text="Max results").grid(row=5, column=0, sticky="w")
+        ttk.Entry(grid, textvariable=self.max_results_var, width=10).grid(row=5, column=1, sticky="w")
 
-        ttk.Label(grid, text="Kiểu dữ liệu").grid(row=6, column=0, sticky="w")
+        ttk.Label(grid, text="Ngôn ngữ (cách nhau bởi dấu phẩy)").grid(row=6, column=0, sticky="w")
+        ttk.Entry(grid, textvariable=self.languages_var).grid(row=6, column=1, columnspan=3, sticky="ew")
+
+        ttk.Label(grid, text="Kiểu dữ liệu").grid(row=7, column=0, sticky="w")
         scope_box = ttk.Combobox(
             grid,
             textvariable=self.scope_var,
@@ -71,14 +77,15 @@ class SourceSection(ttk.LabelFrame):
             state="readonly",
             width=15,
         )
-        scope_box.grid(row=6, column=1, sticky="w")
+        scope_box.grid(row=7, column=1, sticky="w")
 
-        ttk.Checkbutton(grid, text="Chỉ transcript tạo thủ công", variable=self.manual_var).grid(row=7, column=0, columnspan=2, sticky="w", pady=4)
+        ttk.Checkbutton(grid, text="Chỉ transcript tạo thủ công", variable=self.manual_var).grid(row=8, column=0, columnspan=2, sticky="w", pady=4)
 
         apply_responsive_grid(grid, 4)
 
     def _bind_events(self) -> None:
         self.mode_var.trace_add("write", lambda *_: self._toggle_inputs())
+        self.video_text.bind("<<Modified>>", self._update_stats)
 
     def _toggle_inputs(self) -> None:
         mode = FetchMode(self.mode_var.get())
@@ -99,6 +106,14 @@ class SourceSection(ttk.LabelFrame):
             self.video_label.grid(row=3, column=0, sticky="nw")
             self.video_container.grid(row=3, column=1, columnspan=3, sticky="ew")
             self.video_text.focus_set()
+            self._update_stats()
+
+    def _update_stats(self, *_):
+        text = self.video_text.get("1.0", tk.END).strip()
+        count = len([item for item in text.splitlines() if item.strip()])
+        self.video_stats_var.set(f"{count} IDs")
+        if self.video_text.edit_modified():
+            self.video_text.edit_modified(False)
 
     def languages(self) -> list[str]:
         text = self.languages_var.get()
